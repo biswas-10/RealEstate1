@@ -1,5 +1,4 @@
 namespace RealEstate.Application.DTOs.Agent;
-
 public class AgentResponseDto
 {
     public int Id { get; set; }

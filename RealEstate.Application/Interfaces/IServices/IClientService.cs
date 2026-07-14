@@ -1,5 +1,3 @@
-
-
 using RealEstate.Application.DTOs.Client;
 
 namespace RealEstate.Application.Interfaces.IServices;
@@ -17,6 +15,5 @@ public interface IClientService
         int id,
         UpdateClientDto dto);
 
-    Task<bool> DeletedAsync(int id);
+    Task<bool> DeleteAsync(int id);
 }
-

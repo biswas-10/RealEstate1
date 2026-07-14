@@ -1,8 +1,8 @@
 <Solution>
-  <Project Path="BlazorApp1/BlazorApp1.csproj" />
   <Project Path="RealEstate.Api/RealEstate.Api.csproj" />
   <Project Path="RealEstate.Application/RealEstate.Application.csproj" />
-  <Project Path="RealEstate.Domain.Tests/RealEstate.Domain.Tests.csproj" />
   <Project Path="RealEstate.Domain/RealEstate.Domain.csproj" />
+  <Project Path="RealEstate.Frontend/RealEstate.Frontend.csproj" />
   <Project Path="RealEstate.Infrastructure/RealEstate.Infrastructure.csproj" />
+  <Project Path="RealEstate.UnitTests/RealEstate.UnitTests.csproj" />
 </Solution>

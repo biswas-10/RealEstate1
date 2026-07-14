@@ -1,25 +1,19 @@
-using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using RealEstate.Api.Middleware;
+using RealEstate.Application.Settings;
+using RealEstate.Application.Validator;
 using RealEstate.Infrastructure;
-using RealEstate.Infrastructure.Persistence;
-
-// using RealEstate.Infrastructure.Persistence;
-// using RealEstate.Application.Interfaces.IServices;
-// using Microsoft.EntityFrameworkCore;
-// using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddFluentValidationRegistration();
+
+// Register Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -33,47 +27,53 @@ builder.Services.AddSwaggerGen(options =>
         BearerFormat = "JWT"
     });
 
-    options.AddSecurityRequirement(document => new() { [new OpenApiSecuritySchemeReference("Bearer", document)] = [] });
+    options.AddSecurityRequirement(
+        document =>
+            new()
+            {
+                [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+            });
 });
 
+//Bind JwtSettings from appsettings.json
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection("JwtSettings"));
 
+var jwtSettings =
+    builder.Configuration
+        .GetSection("JwtSettings")
+        .Get<JwtSettings>()
+    ?? throw new InvalidOperationException(
+        "JwtSettings configuration is missing");
 
-// For Identity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
-
-// Adding Authentication
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-
-    // Adding Jwt Bearer
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.SaveToken = true;
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["JWT:ValidAudience"],
-            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
-        };
+        options.RequireHttpsMetadata =
+            !builder.Environment.IsDevelopment();
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = 
+                    new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtSettings.Key))
+            };
     });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddSingleton<IExceptionMapper, DefaultExceptionMapper>();
-
-// builder.Services.AddDbContext<AppDbContext>(Options =>
-//     Options.UseNpgsql(
-//         builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddSingleton<IExceptionMapper,
+    DefaultExceptionMapper>();
 
     
 var app = builder.Build();
@@ -84,12 +84,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.MapControllers();
 app.Run();

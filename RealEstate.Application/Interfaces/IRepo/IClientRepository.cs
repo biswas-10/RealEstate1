@@ -1,5 +1,3 @@
-
-
 using RealEstate.Domain.Entities;
 
 namespace RealEstate.Application.Interfaces.IRepo;
@@ -14,6 +12,5 @@ public interface IClientRepository
 
     Task<Client?> UpdateAsync(Client client);
 
-    Task<bool> DeletedAsync(int id);
+    Task<bool> DeleteAsync(int id);
 }
-

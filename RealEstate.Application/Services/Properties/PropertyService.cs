@@ -7,11 +7,13 @@ namespace RealEstate.Application.Services.Properties;
 
 public class PropertyService : IPropertyService
 {
-    public readonly IPropertyRepository _propertyRepository;
+    private readonly IPropertyRepository _propertyRepository;
     // private IPropertyService _propertyServiceImplementation;
 
-    public PropertyService(IPropertyRepository propertyRepository)
+    public PropertyService(
+        IPropertyRepository propertyRepository)
     {
+        ArgumentNullException.ThrowIfNull(propertyRepository);
         _propertyRepository = propertyRepository;
     }
 
@@ -35,6 +37,7 @@ public class PropertyService : IPropertyService
 
     public async Task<PropertyResponseDto> CreateAsync(CreatePropertyDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var property = new Property
         {
             Title = dto.Title,
@@ -50,7 +53,9 @@ public class PropertyService : IPropertyService
         int id,
         UpdatePropertyDto dto)
     {
-        var property = await _propertyRepository.GetByIdAsync(id);
+        ArgumentNullException.ThrowIfNull(dto);
+        var property = 
+            await _propertyRepository.GetByIdAsync(id);
         if (property is null)
         {
             return null;
@@ -66,7 +71,8 @@ public class PropertyService : IPropertyService
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var property = await _propertyRepository.GetByIdAsync(id);
+        var property = 
+            await _propertyRepository.GetByIdAsync(id);
         if (property is null)
         {
             return false;
@@ -76,7 +82,8 @@ public class PropertyService : IPropertyService
         return true;
     }
 
-    private static PropertyResponseDto MapToResponseDto(Property property)
+    private static PropertyResponseDto MapToResponseDto(
+        Property property)
     {
         return new PropertyResponseDto
         {

@@ -1,6 +1,3 @@
-
-
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealEstate.Application.DTOs.Property;
@@ -14,6 +11,7 @@ public class PropertiesController : ApiControllerBase
 
     public PropertiesController(IPropertyService propertyService)
     {
+        ArgumentNullException.ThrowIfNull(propertyService);
         _propertyService = propertyService;
     }
 
@@ -81,7 +79,7 @@ public class PropertiesController : ApiControllerBase
         if (!deleted)
         {
             return NotFoundResponse(
-                $"Property with Id{id} was not found.");
+                $"Property with Id {id} was not found.");
         }
 
         return Success(

@@ -1,5 +1,3 @@
-
-
 using RealEstate.Domain.Entities;
 
 namespace RealEstate.Application.Interfaces.IRepo;
@@ -16,4 +14,3 @@ public interface IAgentRepository
 
     Task<bool> DeleteAsync(int id);
 }
-

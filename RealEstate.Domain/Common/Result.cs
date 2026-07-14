@@ -11,6 +11,19 @@ public class Result
         Error? error)
     {
         IsSuccess = isSuccess;
+
+        if (isSuccess && error is not null)
+        {
+            throw new ArgumentException(
+                "Successful result cannot contain an error.");
+        }
+
+        if (!isSuccess && error is null)
+        {
+            throw new ArgumentException(
+                "Failer result must contain an error.");
+        }
+
         Error = error;
     }
 
@@ -28,6 +41,17 @@ public class Result
 public class Result<T> : Result
     {
         public T? Value { get; }
+
+        public T GetValueorThrow()
+        {
+            if (IsFailure)
+            {
+                throw new InvalidOperationException(
+                    "Cannot access the value of failed result.");
+            }
+
+            return Value!;
+        }
 
         private Result(
             T? value,

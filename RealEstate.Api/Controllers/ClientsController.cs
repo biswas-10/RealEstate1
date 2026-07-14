@@ -1,5 +1,3 @@
-
-
 using Microsoft.AspNetCore.Mvc;
 using RealEstate.Application.DTOs.Client;
 using RealEstate.Application.Interfaces.IServices;
@@ -12,6 +10,7 @@ public class ClientController : ApiControllerBase
 
     public ClientController(IClientService clientService)
     {
+        ArgumentNullException.ThrowIfNull(clientService);
         _clientService = clientService;
     }
 
@@ -74,7 +73,7 @@ public class ClientController : ApiControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var deleted =
-            await _clientService.DeletedAsync(id);
+            await _clientService.DeleteAsync(id);
 
         if (!deleted)
         {
@@ -87,4 +86,3 @@ public class ClientController : ApiControllerBase
             "Client deleted successfully");
     }
 }
-

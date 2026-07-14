@@ -12,6 +12,7 @@ public class UserService : IUserService
     public UserService(
         IUserRepository userRepository)
     {
+        ArgumentNullException.ThrowIfNull(userRepository);
         _userRepository = userRepository;
     }
 
@@ -36,7 +37,8 @@ public class UserService : IUserService
     public async Task<IEnumerable<UserDto>> GetAllAsync()
     {
         // Load every user from the database.
-        var users = await _userRepository.GetAllAsync();
+        var users = 
+            await _userRepository.GetAllAsync();
 
         // Convert each entity into a DTO.
         return users.Select(MapToDto);
@@ -46,6 +48,7 @@ public class UserService : IUserService
     public async Task<UserDto> CreateAsync(
         CreateUserDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         // Prevent duplicate email registration.
         var emailExists =
             await _userRepository

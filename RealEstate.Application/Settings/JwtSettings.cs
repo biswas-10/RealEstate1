@@ -1,5 +1,3 @@
-
-
 namespace RealEstate.Application.Settings;
 
 public class JwtSettings

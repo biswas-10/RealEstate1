@@ -16,16 +16,19 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     public JwtTokenGenerator(
         IOptions<JwtSettings> jwtOptions)
     {
-        _jwtSettings = jwtOptions.Value;
+        _jwtSettings = jwtOptions.Value
+            ?? throw new ArgumentException(nameof(jwtOptions));
     }
 
     public string GenerateToken(User user)
     {
-        var key = new SymmetricSecurityKey(
+        ArgumentNullException.ThrowIfNull(user);
+
+        var securityKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
-        var credentials = new SigningCredentials(
-            key,
+        var signingCredentials = new SigningCredentials(
+            securityKey,
             SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
@@ -33,15 +36,15 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new Claim(
                 ClaimTypes.NameIdentifier,
                 user.Id.ToString()),
-
-            new Claim(
-                ClaimTypes.Email,
-                user.Email),
-
+            
             new Claim(
                 ClaimTypes.Name,
                 user.FullName),
-
+            
+            new Claim(
+                ClaimTypes.Email,
+                user.Email),
+            
             new Claim(
                 ClaimTypes.Role,
                 user.Role)
@@ -53,8 +56,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(
                 _jwtSettings.ExpiryMinutes),
-            signingCredentials:credentials
-        );
+            signingCredentials: signingCredentials
+            );
 
         return new JwtSecurityTokenHandler()
             .WriteToken(token);

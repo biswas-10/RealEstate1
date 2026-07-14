@@ -44,4 +44,3 @@ public sealed class GlobalExceptionMiddleware
         await context.Response.WriteAsync(jsonResponse);
     }
 }
-

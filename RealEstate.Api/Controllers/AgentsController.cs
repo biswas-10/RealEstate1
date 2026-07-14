@@ -1,5 +1,3 @@
-
-
 using Microsoft.AspNetCore.Mvc;
 using RealEstate.Application.DTOs.Agent;
 using RealEstate.Application.Interfaces.IServices;
@@ -13,10 +11,11 @@ public class AgentController : ApiControllerBase
     public AgentController(
         IAgentService agentService)
     {
+        ArgumentNullException.ThrowIfNull(agentService);
         _agentService = agentService;
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         var agents = await _agentService.GetAllAsync();
@@ -70,14 +69,3 @@ public class AgentController : ApiControllerBase
             "Agent deleted successfully");
     }
 }
-
-
-
-
-
-
-
-
-
-
-

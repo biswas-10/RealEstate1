@@ -1,5 +1,3 @@
-
-
 using RealEstate.Application.DTOs.Agent;
 using RealEstate.Domain.Entities;
 
@@ -20,4 +18,3 @@ public interface IAgentService
 
     Task<bool> DeleteAsync(int id);
 }
-

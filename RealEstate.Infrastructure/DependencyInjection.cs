@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,8 +21,12 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddDbContext<AppDbContext>(options =>
+        {
             options.UseNpgsql(
-                configuration.GetConnectionString("DefaultConnection")));
+                    configuration.GetConnectionString("DefaultConnection"))
+                .UseSnakeCaseNamingConvention();
+        });
+        
         services.AddScoped<IPropertyRepository, PropertyRepository>();
         services.AddScoped<IPropertyService, PropertyService>();
 

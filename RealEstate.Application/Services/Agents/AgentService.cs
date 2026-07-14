@@ -1,4 +1,3 @@
-
 using RealEstate.Application.DTOs.Agent;
 using RealEstate.Application.Interfaces.IRepo;
 using RealEstate.Application.Interfaces.IServices;
@@ -12,6 +11,7 @@ public class AgentService : IAgentService
 
     public AgentService(IAgentRepository agentRepository)
     {
+        ArgumentNullException.ThrowIfNull(agentRepository);
         _agentRepository = agentRepository;
     }
 
@@ -36,6 +36,7 @@ public class AgentService : IAgentService
     public async Task<AgentResponseDto> CreateAsync(
         CreateAgentDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var agent = new Agent
         {
             FullName = dto.FullName,
@@ -50,6 +51,7 @@ public class AgentService : IAgentService
         int id,
         UpdateAgentDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var agent = await _agentRepository.GetByIdAsync(id);
 
         if (agent is null)
@@ -87,15 +89,3 @@ public class AgentService : IAgentService
         };
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-

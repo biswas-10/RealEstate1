@@ -1,6 +1,5 @@
-
-
 using FluentValidation;
+using FluentValidation.Validators;
 using RealEstate.Application.DTOs.Agent;
 
 namespace RealEstate.Application.Validator;
@@ -11,25 +10,16 @@ public class CreateAgentValidator : AbstractValidator<CreateAgentDto>
     {
         RuleFor(x => x.FullName)
             .NotEmpty()
-            .WithMessage("Full name is required");
-        
-        RuleFor(x => x.FullName)
+            .WithMessage("Full name is required")
             .MaximumLength(100)
             .WithMessage("Full name cannot exceed 100 characters.");
         
         RuleFor(x => x.Email)
             .NotEmpty()
-            .WithMessage("Email is required.");
-        
-        RuleFor(x => x.Email)
+            .WithMessage("Email is required.")
             .EmailAddress()
-            .WithMessage("Invalid email format.");
-        
-        RuleFor(x => x.Email)
+            .WithMessage("Invalid email format.")
             .MaximumLength(200)
             .WithMessage("Email cannot exceed 200 characters.");
-        
-        
     }
 }
-

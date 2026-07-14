@@ -1,31 +1,34 @@
 using RealEstate.Application.DTOs.Auth;
 using RealEstate.Application.Interfaces.IRepo;
 using RealEstate.Application.Interfaces.IServices;
+using RealEstate.Application.Settings;
 using RealEstate.Domain.Common;
 using RealEstate.Domain.Entities;
+using Microsoft.Extensions.Options;
 
 namespace RealEstate.Application.Services.Auth;
 
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
-
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
-
     private readonly IRefreshTokenGenerator _refreshTokenGenerator;
-
     private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly JwtSettings _jwtSettings;
 
     public AuthService(
         IUserRepository userRepository,
         IJwtTokenGenerator jwtTokenGenerator,
         IRefreshTokenGenerator refreshTokenGenerator,
-        IRefreshTokenRepository refreshTokenRepository)
+        IRefreshTokenRepository refreshTokenRepository,
+        IOptions<JwtSettings> jwtOptions)
     {
         _userRepository = userRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
         _refreshTokenGenerator = refreshTokenGenerator;
         _refreshTokenRepository = refreshTokenRepository;
+
+        _jwtSettings = jwtOptions.Value;
     }
 
     public async Task<Result<AuthResponseDto?>> LoginAsync(
@@ -77,20 +80,11 @@ public class AuthService : IAuthService
 
         return Result<AuthResponseDto?>
             .Success(
-                new AuthResponseDto
-                {
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken.Token,
-
-                    // Must match JwtSettings expiry.
-                    ExpiresAt =
-                        DateTime.UtcNow.AddMinutes(60),
-
-                    UserId = user.Id,
-                    FullName = user.FullName,
-                    Email = user.Email,
-                    Role = user.Role
-                });
+                CreateAuthResponse(
+                    user,
+                    accessToken,
+                    refreshToken.Token)
+            );
     }
 
     public async Task<Result<AuthResponseDto?>> RefreshAsync(
@@ -105,7 +99,7 @@ public class AuthService : IAuthService
         // Validate token.
         if (storedToken is null ||
             storedToken.IsRevoked ||
-            storedToken.ExpiresAt < DateTime.UtcNow)
+            storedToken.IsExpired)
         {
             return Result<AuthResponseDto?>
                 .Failure(
@@ -161,19 +155,30 @@ public class AuthService : IAuthService
 
         return Result<AuthResponseDto?>
             .Success(
-                new AuthResponseDto
-                {
-                    AccessToken = newAccessToken,
-                    RefreshToken =
-                        newRefreshToken.Token,
+                CreateAuthResponse(
+                    user,
+                    newAccessToken,
+                    newRefreshToken.Token)
+                );
+    }
 
-                    ExpiresAt =
-                        DateTime.UtcNow.AddMinutes(60),
+    private AuthResponseDto CreateAuthResponse(
+        User user,
+        string accessToken,
+        string refreshToken)
+    {
+        return new AuthResponseDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
 
-                    UserId = user.Id,
-                    FullName = user.FullName,
-                    Email = user.Email,
-                    Role = user.Role
-                });
+            ExpiresAt = DateTime.UtcNow.AddMinutes(
+                _jwtSettings.ExpiryMinutes),
+            
+            UserId = user.Id,
+            FullName = user.FullName,
+            Email = user.Email,
+            Role = user.Role
+        };
     }
 }

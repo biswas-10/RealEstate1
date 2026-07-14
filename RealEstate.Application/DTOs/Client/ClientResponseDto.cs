@@ -1,5 +1,3 @@
-
-
 namespace RealEstate.Application.DTOs.Client;
 
 public class ClientResponseDto
@@ -8,4 +6,3 @@ public class ClientResponseDto
     public string FullName { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
 }
-

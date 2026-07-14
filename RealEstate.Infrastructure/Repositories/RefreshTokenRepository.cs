@@ -1,5 +1,3 @@
-
-
 using Microsoft.EntityFrameworkCore;
 using RealEstate.Application.Interfaces.IRepo;
 using RealEstate.Domain.Entities;
@@ -13,23 +11,29 @@ public class RefreshTokenRepository : IRefreshTokenRepository
 
     public RefreshTokenRepository(AppDbContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
         _context = context;
     }
 
     public async Task<RefreshToken?> GetByTokenAsync(string token)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(token);
+
         return await _context.RefreshTokens
-            .Include(rt => rt.User)
-            .FirstOrDefaultAsync(rt => rt.Token == token);
+            .AsNoTracking()
+            .Include(refreshToken => refreshToken.User)
+            .FirstOrDefaultAsync(refreshToken => refreshToken.Token == token);
     }
 
     public async Task AddAsync(RefreshToken refreshToken)
     {
+        ArgumentNullException.ThrowIfNull(refreshToken);
         await _context.RefreshTokens.AddAsync(refreshToken);
     }
 
     public async Task UpdateAsync(RefreshToken refreshToken)
     {
+        ArgumentNullException.ThrowIfNull(refreshToken);
         _context.RefreshTokens.Update(refreshToken);
         await Task.CompletedTask;
     }

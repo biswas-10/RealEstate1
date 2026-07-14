@@ -1,5 +1,3 @@
-
-
 using Microsoft.AspNetCore.Mvc;
 using RealEstate.Api.Contracts;
 

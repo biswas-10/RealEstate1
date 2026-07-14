@@ -1,5 +1,3 @@
-
-
 using RealEstate.Application.DTOs.Client;
 using RealEstate.Application.Interfaces.IRepo;
 using RealEstate.Application.Interfaces.IServices;
@@ -14,6 +12,7 @@ public class ClientService : IClientService
     public ClientService(
         IClientRepository clientRepository)
     {
+        ArgumentNullException.ThrowIfNull(clientRepository);
         _clientRepository = clientRepository;
     }
 
@@ -38,6 +37,7 @@ public class ClientService : IClientService
 
     public async Task<ClientResponseDto> CreateAsync(CreateClientDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var client = new Client
         {
             FullName = dto.FullName,
@@ -52,6 +52,7 @@ public class ClientService : IClientService
         int id,
         UpdateClientDto dto)
     {
+        ArgumentNullException.ThrowIfNull(dto);
         var client =
             await _clientRepository.GetByIdAsync(id);
         if (client is null)
@@ -72,9 +73,9 @@ public class ClientService : IClientService
         return MapToResponseDto(updatedClient);
     }
 
-    public async Task<bool> DeletedAsync(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        return await _clientRepository.DeletedAsync(id);
+        return await _clientRepository.DeleteAsync(id);
     }
 
 
