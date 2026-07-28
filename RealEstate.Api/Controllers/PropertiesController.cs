@@ -41,6 +41,7 @@ public class PropertiesController : ApiControllerBase
             "Property retrieved successfully");
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(CreatePropertyDto dto)
     {
@@ -51,6 +52,7 @@ public class PropertiesController : ApiControllerBase
             "Property created successfully");
     }
 
+    [Authorize]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(
         int id,
@@ -70,6 +72,7 @@ public class PropertiesController : ApiControllerBase
             "Property updated successfully");
     }
 
+    [Authorize]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

@@ -1,0 +1,65 @@
+@page "/clients"
+
+@using RealEstate.Frontend.Models
+@inject ApiHandler ApiHandler
+
+<PageTitle>Clients</PageTitle>
+
+<h3>Clients</h3>
+
+<hr />
+
+@if (clients is null)
+{
+    <p>
+        <em>Loading clients...</em>
+    </p>
+}
+else if (!clients.Success)
+{
+    <div class="alert alert-danger">
+        @clients.Message
+    </div>
+}
+else if (clients.Data is null || clients.Data.Count == 0)
+{
+    <div class="alert alert-info">
+        No clients found.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Full Name</th>
+            <th>Phone</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        @foreach (var client in clients.Data)
+        {
+            <tr>
+                <td>@client.Id</td>
+                <td>@client.FullName</td>
+                <td>@client.Phone</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code
+{
+    // Loaded from GET /api/Client
+    private ApiResponse<List<ClientDto>>? clients;
+
+    protected override async Task OnInitializedAsync()
+    {
+        clients =
+            await ApiHandler.GetAsync<ApiResponse<List<ClientDto>>>(
+                ApiEndpoints.Clients);
+    }
+}

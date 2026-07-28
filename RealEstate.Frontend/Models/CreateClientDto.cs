@@ -1,12 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace RealEstate.Application.DTOs.Client;
+namespace RealEstate.Frontend.Models;
 
 public class CreateClientDto
 {
     [Required]
     public string FullName { get; set; } = string.Empty;
-    
+
     [Required]
     [Phone]
     public string Phone { get; set; } = string.Empty;

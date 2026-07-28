@@ -1,0 +1,65 @@
+
+@page "/agents"
+@using RealEstate.Frontend.Models
+@inject ApiHandler ApiHandler
+
+<PageTitle>Agents</PageTitle>
+<h3>Agents</h3>
+<hr/>
+
+@if (agents is null)
+{
+    <p>
+        <em>Loading agents...</em>
+    </p>
+}
+
+else if (!agents.Success)
+{
+    <div class="alert alert-danger">
+        @agents.Message
+    </div>
+}
+
+else if (agents.Data is null || agents.Data.Count == 0)
+{
+    <div class="alert alert-info">
+        No agents found.
+    </div>
+}
+
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Full Name</th>
+            <th>Email</th>
+        </tr>
+        </thead>
+        
+        <tbody>
+        @foreach (var agent in agents.Data)
+        {
+            <tr>
+                <td>@agent.Id</td>
+                <td>@agent.FullName</td>
+                <td>@agent.Email</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code
+{
+    private ApiResponse<List<AgentDto>>? agents;
+
+    protected override async Task OnInitializedAsync()
+    {
+        agents =
+            await ApiHandler.GetAsync<ApiResponse<List<AgentDto>>>(
+                ApiEndpoints.Agents);
+    }
+}

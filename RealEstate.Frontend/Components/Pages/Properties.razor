@@ -1,0 +1,71 @@
+@page "/properties"
+@using RealEstate.Frontend.Models
+@inject ApiHandler ApiHandler
+
+<PageTitle>Properties</PageTitle>
+
+<h3>Properties</h3>
+
+<hr/>
+
+@if (properties is null)
+{
+    <p>
+        <em>Loading properties...</em>
+    </p>
+}
+
+else if (!properties.Success)
+{
+    <div class="alert alert-danger">
+        @properties.Message
+    </div>
+}
+
+else if (properties.Data is null || properties.Data.Count == 0)
+{
+    <div class="alert alert-info">
+        No properties found.
+    </div>
+}
+
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+        
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Address</th>
+            <th>Price</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        
+        @foreach (var property in properties.Data)
+        {
+            <tr>
+                <td>@property.Id</td>
+                <td>@property.Title</td>
+                <td>@property.Address</td>
+                <td>@property.Price.ToString("N2")</td>
+                <td>@property.Status</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code
+{
+    private ApiResponse<List<PropertyDto>>? properties;
+
+    protected override async Task OnInitializedAsync()
+    {
+        properties =
+            await ApiHandler.GetAsync<ApiResponse<List<PropertyDto>>>(
+                ApiEndpoints.Properties);
+    }
+}
